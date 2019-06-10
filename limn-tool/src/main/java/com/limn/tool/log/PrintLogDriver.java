@@ -3,11 +3,15 @@ package com.limn.tool.log;
 
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -159,6 +163,13 @@ public abstract class PrintLogDriver implements LogControlInterface{
 	
 	public void printLog(String log,int style){
 	}
+
+	public void printlnLog(String log,int style){
+		runLogWrite(new SimpleDateFormat("MM-dd HH:mm:ss").format(new Date())+"-->",log + "\n\r",style);
+	}
+
+	public void printContinueLog(String log,int style){
+	}
 	
 	
 	public void printLocalLog(String log,int style){
@@ -227,5 +238,31 @@ public abstract class PrintLogDriver implements LogControlInterface{
 		}
 	
 	}
+	
+	
+	public void clearLog(){
+		try {
+			writeLogPane.getDocument().remove(0, writeLogPane.getDocument().getLength());
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+	
+//	class MyJTextPane extends JTextPane {
+//	    public boolean getScrollableTracksViewportWidth() {
+//	        return false;
+//	    }
+//	    public void setSize(Dimension d) {
+//	        if (d.width < getParent().getSize().width) {
+//	            d.width = getParent().getSize().width;
+//	        }
+//	        d.width += 100;
+//	        super.setSize(d);
+//	    }
+//	
+//	}
 	
 }

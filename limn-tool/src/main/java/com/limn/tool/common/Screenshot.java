@@ -27,6 +27,7 @@ public class Screenshot {
 	private String defaultImageFormat = "png";
 
 	Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+	
 
 
 	/**
@@ -74,4 +75,10 @@ public class Screenshot {
 		}
 		return bitMapPath + "." + imageFormat;
 	}
+	
+	
+	
+	
+	
+	
 }

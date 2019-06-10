@@ -6,6 +6,10 @@ function getLocatorByNode(node){
 	}
 	if(dict["id"]!=undefined){
 		return dict["id"];
+	}else if(dict["name"]!=undefined){
+		if(document.getElementsByName(dict["name"]).length==1){
+			return dict["name"];
+		}
 	}
 	return getXPathByNode(node);
 }
@@ -101,3 +105,88 @@ function getPrefixFromNS(ns) {
 function isHtmlDocument(doc) {
 	return doc.contentType === 'text/html';
 }
+
+
+
+
+//触发事件  type  mouseover .....
+function fireEvent(node,type){
+	if (window.navigator.userAgent.indexOf("MSIE")>=1){
+		node.fireEvent("on"+type);
+	}else{
+		var me = document.createEvent("MouseEvents");
+		me.initEvent(type,true,true);
+		node.dispatchEvent(me);
+	}
+}
+
+//判断IE版本IE9.0。
+function getIeVersion(){
+	var browser=navigator.appName
+	var b_version=navigator.appVersion
+	var version=b_version.split(";");
+	var boolRe = -1;
+	for(var i=0;i<version.length;i++){
+		if (version[i].indexOf("MSIE") != -1){
+			var trim_Version=version[i].replace(/[ ]/g,"");
+			if(browser=="Microsoft Internet Explorer"){
+				if (trim_Version=="MSIE9.0"){
+					boolRe = 9;
+				}else if(trim_Version=="MSIE8.0"){
+					boolRe = 8;
+				}else if(trim_Version=="MSIE7.0"){
+					boolRe = 7;
+				}else if(trim_Version=="MSIE6.0"){
+					boolRe = 6;
+				}else if(trim_Version=="MSIE10.0"){
+					boolRe = 10;
+				}else if(trim_Version=="MSIE11.0"){
+					boolRe = 11;
+				}
+			}
+			break;
+		}
+	}
+	return boolRe;
+}
+
+// 日期插件录入日期
+function setDatePluginsValue(htmlAttribute,attributeValue,setValue){
+	var datePlugins = setDatePluginsType();
+	switch(datePlugins){
+		case 1:
+			$("input["+htmlAttribute+"='"+attributeValue+"']")[0].setAttribute('value',setValue);
+			break;
+		case 2:
+			$("input["+htmlAttribute+"='"+attributeValue+"']").datepicker('setDate',setValue);
+			break;
+	}
+}
+
+function setDatePluginsType(){
+	var type = -1;
+	var arrScript = document.head.getElementsByTagName('script');
+	var arrScriptLen = arrScript.length;
+	for(var i=0;i<arrScriptLen;i++){
+		var scriptSrc = arrScript[i].src;
+		if (scriptSrc.indexOf('datetimepicker.js') != -1){
+			type = 1;
+			break;
+		}
+	}
+	if (type == -1){
+		for(var i=0;i<arrScriptLen;i++){
+			var scriptSrc = arrScript[i].src;
+			if(scriptSrc.indexOf('datepicker.js') != -1){
+				type = 2;
+				break;
+			}
+		}
+	}
+	return type;
+}
+
+function $id(str){
+	return document.getElementById(str);
+}
+

@@ -26,6 +26,14 @@ public class RandomData {
 	 * @return
 	 */
 	public static int getNumberRange(int min, int max){
+		if(min == max){
+			return min;
+		}else if (min > max){
+			int r = max;
+			max = min;
+			min = r;
+		}
+
 		Random random = new Random();
 		int s = random.nextInt(max) % (max - min + 1) + min;
 		return s;
@@ -97,7 +105,20 @@ public class RandomData {
         }
         return new String(randBuffer);
 	}
-	
+	/**
+	 * 随机生成一个字符串 字母大小写+数字
+	 * @param length 字符串长度
+	 * @return
+	 */
+	public static String getInt(int length){
+		Random randGen = new Random();
+		char[] data = ("0123456789").toCharArray();
+		char [] randBuffer = new char[length];
+		for (int i=0; i<randBuffer.length; i++) {
+			randBuffer[i] = data[randGen.nextInt(10)];
+		}
+		return new String(randBuffer);
+	}
 	
 	
 }

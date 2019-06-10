@@ -51,5 +51,62 @@ public class BaseKeyWordType {
 	 * 
 	 */
 	public static final String MOUSE_EVENT = "鼠标事件";
+	
+	/**
+	 * 说明: 等待<br>
+	 * 参数1: 等待的秒数<br>
+	 * 实例: 等待:5<br>
+	 * 
+	 */
+	public static final String WAIT = "等待";
+	
+	/**
+	 * 说明: EXPRESSION<br>
+	 * 参数1: 表达式<br>
+	 * 实例: 表达式:{set}={get}&'a' 、 内置函数自增{houseName}=getAutoIncrement(5) <br>
+	 * 
+	 */
+	public static final String EXPRESSION = "表达式";
+	
+	/**
+	 * 说明: ADDATTACHMENT<br>
+	 * 参数1: 附件的相对路径<br>
+	 * 实例: 添加附件:attachment\\upload.txt <br>
+	 * 
+	 */
+	public final static String ADDATTACHMENT = "添加附件";
 
+	/**
+	 * 说明: 获取控件的值，存入变量中<br>
+	 * 参数1: xpath别名<br>
+	 * 参数2: 变量名<br>
+	 * 实例: 获取:xpath别名:{变量} <br>
+	 * 
+	 */
+	public final static String GETWEBELEMENTVALUETOVAR = "获取";
+	
+	/**
+	 * 说明: 切换浏览器页面（一步操作可能弹出新的浏览器页面）<br>
+	 * 参数1: 第i个页面<br>
+	 * 实例: 切换页面:2 （从1开始，1代表第一个浏览器） <br>
+	 * 
+	 */
+	public final static String CHANGEBROTAB = "切换页面";
+	
+	/**
+	 * 说明: 关闭浏览器页面<br>
+	 * 参数1: 第i个页面<br>
+	 * 实例: 关闭页面:2 （从1开始，1代表第一个浏览器） <br>
+	 * 
+	 */
+	public final static String CLOSEBROTAB = "关闭页面";
+	
+	/**
+	 * 说明: 验证界面上的数据，读取预期结果列<br>
+	 * 预期结果参数1: xpath别名<br>
+	 * 预期结果参数2: 控件值<br>
+	 * 实例: 验证， 预期结果：input[@id='test']:1<br>
+	 * 
+	 */
+	public final static String VERIFICATION = "验证";
 }

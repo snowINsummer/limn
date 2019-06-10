@@ -4,11 +4,14 @@ package com.limn.frame.keyword;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-
-import com.limn.driver.Driver;
 import com.limn.driver.common.OperateWindows;
 import com.limn.driver.exception.SeleniumFindException;
-import com.limn.tool.common.Print;
+import com.limn.tool.bean.RunParameter;
+import com.limn.tool.common.BaseToolParameter;
+import com.limn.tool.common.BaseUntil;
+import com.limn.tool.common.Common;
+import com.limn.tool.exception.ParameterException;
+import com.limn.tool.random.RandomData;
 
 /**
  * 基础关键字
@@ -17,32 +20,35 @@ import com.limn.tool.common.Print;
  */
 public class BaseKeyWordDriverImpl implements KeyWordDriver {
 	
-	public KeyWordDriver keyWord = null;
 	private LinkedHashMap<String,KeyWordDriver> KWD = new LinkedHashMap<String,KeyWordDriver>();
 	private LinkedHashMap<String,Class<?>> KWDT = new LinkedHashMap<String,Class<?>>();
 	private HashSet<String> allKeyWord = new HashSet<String>();
 	private boolean flag = false;
 	
+	private BaseRunKeyWordImpl brwi = new BaseRunKeyWordImpl();
+	
+	
+	
 	@Override
 	public int start(String[] step) {
 
-		int status = -1;
+		int status = 1;
 		try {
 
 			switch (step[0]) {
 
 			//启动浏览器
 			case BaseKeyWordType.START_BROWSER:
-				BaseRunKeyWordImpl.startBrowser(step);
+				brwi.startBrowser(step);
 				break;
 			//关闭浏览器
 			case BaseKeyWordType.CLOSE_BROSWER:
-				BaseRunKeyWordImpl.stopBroswer();
+				brwi.stopBroswer();
 				break;
 			//录入
 			case BaseKeyWordType.INPUT:
 				cheakKeyWordCount(step.length, 2);
-				Driver.setValue(step[1], step[2]);
+				brwi.inputValue(step);
 				break;
 			//提示框
 			case BaseKeyWordType.DIALOG:
@@ -56,13 +62,51 @@ public class BaseKeyWordDriverImpl implements KeyWordDriver {
 			//页面跳转	
 			case BaseKeyWordType.CHANGE_URL:
 				cheakKeyWordCount(step.length, 1);
-				BaseRunKeyWordImpl.toURL(step);
+				brwi.toURL(step);
 				break;
 			case BaseKeyWordType.KEYBOARD_EVENT:
 				cheakKeyWordCount(step.length, 1);
-				BaseRunKeyWordImpl.keyBoardEvent(step);
+				brwi.keyBoardEvent(step);
 				
 				break;
+			case BaseKeyWordType.WAIT:
+				cheakKeyWordCount(step.length, 2);
+				int waitTime = Integer.valueOf(step[1]);
+				if(step.length == 3 && BaseUntil.isNotEmpty(step[2])){
+					waitTime = RandomData.getNumberRange(Integer.valueOf(step[1]),Integer.valueOf(step[2]));
+				}
+				BaseToolParameter.getPrintThreadLocal().log("等待" + waitTime + "秒",0);
+
+				Common.wait(Integer.valueOf(waitTime)*1000);
+				break;
+			case BaseKeyWordType.EXPRESSION:
+				cheakKeyWordCount(step.length, 1);
+				brwi.executeExpression(step);
+				break;
+			case BaseKeyWordType.ADDATTACHMENT:
+				cheakKeyWordCount(step.length, 2);
+				brwi.addAttachment(step);
+				break;
+			case BaseKeyWordType.GETWEBELEMENTVALUETOVAR:
+				cheakKeyWordCount(step.length, 2);
+				brwi.getWebElementValueToVar(step);
+				break;
+			case BaseKeyWordType.CHANGEBROTAB:
+				cheakKeyWordCount(step.length, 2);
+				brwi.changeBroTab(step);
+				break;
+			case BaseKeyWordType.CLOSEBROTAB:
+				cheakKeyWordCount(step.length, 2);
+				brwi.closeBroTab(step);
+				break;
+//			case BaseKeyWordType.VERIFICATION:
+//				CheckItems checkItems = new CheckItems();
+//				checkItems.branch(step);
+//				if (!checkItems.isBoolActul()){
+//					status = -5;
+//					Parameter.ERRORLOG = "预期结果与实际结果不一致。请看CHECKPOINT信息。";
+//				}
+//				break;
 			//自定义关键字
 			default:
 
@@ -76,11 +120,22 @@ public class BaseKeyWordDriverImpl implements KeyWordDriver {
 					}
 				}
 				if (-1 == status) {
-					Print.log("不存在此关键字:" + step[0], 2);
+					BaseToolParameter.getPrintThreadLocal().log("不存在此关键字:" + step[0], 2);
 				}
 			}
 		} catch (SeleniumFindException e) {
-			Print.log(e.getMessage(), 2);
+			status = -2;
+			RunParameter.getResultPaht().setErrorMessage(e.getMessage());
+			BaseToolParameter.getPrintThreadLocal().log(e.getMessage(), 2);
+		} catch (ParameterException e) {
+			status = -2;
+			RunParameter.getResultPaht().setErrorMessage(e.getMessage());
+			BaseToolParameter.getPrintThreadLocal().log(e.getMessage(), 2);
+		} catch (Exception e){
+			status = -2;
+			RunParameter.getResultPaht().setErrorMessage(e.getMessage());
+			BaseToolParameter.getPrintThreadLocal().log(e.getMessage(), 2);
+			e.printStackTrace();
 		}
 		return status;
 

@@ -57,11 +57,14 @@ public class KeyWordPanel extends CustomPanel {
 	private JScrollPane helpPaneJSP = new JScrollPane(helpPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 	
 	private static DefaultMutableTreeNode keyWordNode = new DefaultMutableTreeNode("关键字列表"); 
-	
-	public KeyWordPanel(){
+
+	private DebugEditFrame def = null;
+	public KeyWordPanel(DebugEditFrame def){
+
+
 		setBounds(0, 0, 635, 395);
 		setLayout(null);
-	
+		this.def = def;
 		keyWordTree = new JTree(keyWordNode);
 		
 		keyWordTreeJSP = new JScrollPane(keyWordTree, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -71,10 +74,13 @@ public class KeyWordPanel extends CustomPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) keyWordTree.getLastSelectedPathComponent();//返回最后选定的节点
+				if(null == selectedNode){
+					return ;
+				}
 				String name = selectedNode.toString();
 				if(keyWordAnnotate.containsKey(keyWord.get(name))){
 					helpPane.setText(keyWordAnnotate.get(keyWord.get(name)));
-					DebugEditFrame.setStepTextArea(name + ":");
+					def.setStepTextArea(name + ":");
 				}
 			}
 		});

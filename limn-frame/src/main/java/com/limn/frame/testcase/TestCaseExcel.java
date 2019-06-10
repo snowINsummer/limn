@@ -3,6 +3,7 @@ package com.limn.frame.testcase;
 
 import java.util.HashMap;
 
+import com.limn.tool.common.BaseToolParameter;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -14,8 +15,10 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
+
 import com.limn.tool.regexp.RegExp;
 import com.limn.tool.common.Print;
+import com.limn.tool.exception.ExcelEditorException;
 import com.limn.tool.external.ExcelEditor;
 
 
@@ -32,6 +35,10 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 	private int excelSheetIndex;
 	//当前的行
 	private int currentRow;
+	/**
+	 * 所有要执行的用例个数
+	 */
+	private int allCase = 0;
 	
 	/**
 	 * 
@@ -53,6 +60,18 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 		excelSheetIndex = sheetIndex;
 		excelSheet = excelBook.getSheetAt(excelSheetIndex);
 		getExcelModule();
+	}
+	
+	@Override
+	public void activateSheet(String sheetName) throws ExcelEditorException {
+		int index = getSheetIndexBySheetName(sheetName);
+		if(index == -1){
+			throw new ExcelEditorException("错误的sheetName:" + sheetName);
+		}
+		excelSheetIndex = index;
+		excelSheet = excelBook.getSheetAt(excelSheetIndex);
+		getExcelModule();
+		
 	}
 	
 	
@@ -84,17 +103,18 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 		excelModuleName = new HashMap<Integer,String>();
 		
 		int index = 0;
-		Print.debugLog("***************************", 2);
+		BaseToolParameter.getPrintThreadLocal().debugLog("***************************", 2);
 		for (Row row:excelSheet){	
+			excelSheet.getSheetName();
 			setCurrentRow(row.getRowNum());
 			if (getTestCaseNo() != null && getTestCaseNo().equals("用例编号")){
 				excelModuleStartIndex.put(index, row.getRowNum() + 1);
-				Print.debugLog(index + ":Start:"+ (row.getRowNum() + 1), 2);
+				BaseToolParameter.getPrintThreadLocal().debugLog(index + ":Start:"+ (row.getRowNum() + 1), 2);
 				excelModuleName.put(index, getValue(excelSheetIndex,row.getRowNum() - 1,1));
-				Print.debugLog(index + ":Name:"+ getValue(excelSheetIndex,row.getRowNum() - 1,1), 2);
+				BaseToolParameter.getPrintThreadLocal().debugLog(index + ":Name:"+ getValue(excelSheetIndex,row.getRowNum() - 1,1), 2);
 				if(index > 0){
 					excelModuleEndIndex.put(index-1, row.getRowNum() - 2);
-					Print.debugLog((index-1) + ":End:"+ (row.getRowNum() - 2), 2);
+					BaseToolParameter.getPrintThreadLocal().debugLog((index-1) + ":End:"+ (row.getRowNum() - 2), 2);
 				}
 				index++;
 			}
@@ -106,13 +126,13 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 			removeInvalidRow(excelModuleStartIndex.get(index));
 			save();
 			excelModuleEndIndex.put(index, excelSheet.getLastRowNum());
-			Print.debugLog(index + ":End:" + excelSheet.getLastRowNum(), 2);
+			BaseToolParameter.getPrintThreadLocal().debugLog(index + ":End:" + excelSheet.getLastRowNum(), 2);
 		}
 //		}else{
 //			excelModuleStartIndex.put(1, 4);
 //			excelModuleEndIndex.put(1, 4);
 //		}
-		Print.debugLog("***************************", 2);
+		BaseToolParameter.getPrintThreadLocal().debugLog("***************************", 2);
 	}
 	
 	
@@ -186,6 +206,11 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 		return getCurrentCell(7);
 	}
 	
+	@Override
+	public String getAssociatedProperites() {
+		return getCurrentCell(8);
+	}
+	
 	
 	@Override
 	public void setExecuted(String value) {
@@ -233,6 +258,11 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 	@Override
 	public void setResult(String value) {
 		setCurrentCell(7,value);
+	}
+	
+	@Override
+	public void setAssociatedProperites(String value) {
+		setCurrentCell(8,value);
 	}
 	
 //	@Override
@@ -305,7 +335,7 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 			excelSheet.shiftRows(rowNum + 1,excelSheet.getLastRowNum(),-1);
 			return true;
 		}else{
-			Print.log("删除行已超出最大行数", 3);
+			BaseToolParameter.getPrintThreadLocal().log("删除行已超出最大行数", 3);
 			return false;
 		}
 	}
@@ -315,7 +345,7 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 		if(excelModuleStartIndex.containsKey(index)){
 			setValue(excelSheetIndex, excelModuleStartIndex.get(index) - 2, 1, moduleName);
 		}else{
-			Print.log("index:" + index + " 的模块",2);
+			BaseToolParameter.getPrintThreadLocal().log("index:" + index + " 的模块",2);
 		}
 	}
 	
@@ -413,11 +443,12 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 					row.createCell(5);
 					row.createCell(6);
 					row.createCell(7);
+					row.createCell(8);
 				}else{
 					setCellStyle(row,contentStyle);
 				}
 				row.setHeightInPoints(13);
-				for(int cellIndex = 0;cellIndex<=7;cellIndex++){
+				for(int cellIndex = 0;cellIndex<=8;cellIndex++){
 					HSSFCell cell = row.getCell(cellIndex);
 					int lineCount = 1;
 					
@@ -442,12 +473,13 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 		excelSheet.autoSizeColumn((short)5);
 		excelSheet.autoSizeColumn((short)6);
 		excelSheet.autoSizeColumn((short)7);
+		excelSheet.autoSizeColumn((short)8);
 	}
 	
 	
 	private void setCellStyle(HSSFRow row, CellStyle sytel_0){
 		
-		for (int i = 0; i < 8; i++){
+		for (int i = 0; i < 9; i++){
 			if(null == row.getCell(i)){
 				row.createCell(i);
 			}
@@ -527,7 +559,8 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 		for(int i=0;i<sheetCount;i++){
 			activateSheet(i);
 			setCurrentRow(0);
-			if(getCurrentCell(1).toString().equals("1.0") || getCurrentCell(1).toString().equals("1")){
+			String isExecute = getCurrentCell(1);
+			if(null != isExecute && isExecute.toString().equals("Y")){
 				getExcelModule();
 				for(int index:excelModuleStartIndex.keySet()){
 					int row = excelModuleStartIndex.get(index);
@@ -538,7 +571,7 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 							relate.put(getTestCaseNo(), getRelatedNo());
 							relate.put(getTestCaseNo() + "_Location", excelSheetIndex + "_" + row);
 						}else if(!getTestCaseNo().isEmpty()){
-							Print.log("用例编号存在重复:" + getTestCaseNo() + " " + excelSheetIndex
+							BaseToolParameter.getPrintThreadLocal().log("用例编号存在重复:" + getTestCaseNo() + " " + excelSheetIndex
 									+ "_" + row , 2);
 						}
 					}
@@ -557,12 +590,40 @@ public class TestCaseExcel extends ExcelEditor implements TestCase {
 		//设置单元格链接的地址
 		link.setAddress(path);
 		//在当前的单元格上生效
-		excelSheet.getRow(currentRow).getCell(index - 1).setHyperlink(link);
+		excelSheet.getRow(currentRow).getCell(index).setHyperlink(link);
 	}
 	
 	@Override
 	public void setHyperLinks(int index, String path) {
 		setExcelHyperLinks(index,path);
 	}
+
+
+	@Override
+	public int getAllCase() {
+		int allCase = 0;
+		int sheetCount = getSheetSize();
+		int currentSheetIndex = getExcelSheetIndex();
+		for(int i=0;i<sheetCount;i++){
+			activateSheet(i);
+			setCurrentRow(0);
+			for(int j=0;j<=getSheetLastRowNumber();j++){
+				setCurrentRow(j);
+				String isExecute = getCurrentCell(0);
+				if (null != isExecute && isExecute.toString().equals("Y")){
+					allCase++;
+				}
+			}
+		}
+		activateSheet(currentSheetIndex);
+		this.allCase = allCase;
+		return this.allCase;
+	}
+
+
+
+
+
+
 	
 }

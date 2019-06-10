@@ -2,12 +2,8 @@ package com.limn.driver.common;
 
 import com.limn.driver.Driver;
 import com.limn.driver.exception.SeleniumFindException;
+import com.limn.tool.common.*;
 import com.limn.tool.log.RunLog;
-import com.limn.tool.common.CallBat;
-import com.limn.tool.common.FileUtil;
-import com.limn.tool.common.GetSystemInfo;
-import com.limn.tool.common.Print;
-
 
 
 /**
@@ -22,7 +18,7 @@ public class OperateDialog {
 	 */
 	public static String importFile(String filePath){
 		// 浏览器不同，弹出的对话框标题也不同。需要区分
-		String browserName = Driver.getBrowserName();
+		String browserName = DriverParameter.getDriverPaht().getBrowserName();
 		String cmdBufferedReader = "";
 		if (browserName.equalsIgnoreCase("firefox")){
 			cmdBufferedReader = CallBat.returnExec(System.getProperty("user.dir")+"/bin/DownLoad_Upload_Dialog.exe " + "文件上载 " + "\""+filePath+"\"" + " 打开");
@@ -43,19 +39,19 @@ public class OperateDialog {
 	 */
 	public static void saveFile(String path, String key) throws SeleniumFindException{
 		if (!FileUtil.exists(path)){
-			Print.log("文件不存在："+path, 2);
+			BaseToolParameter.getPrintThreadLocal().log("文件不存在："+path, 2);
 			return;
 		}
 		String cmdBufferedReader = "";
-		String browserName = Driver.getBrowserName();
+		String browserName = DriverParameter.getDriverPaht().getBrowserName();
 		if (browserName.equalsIgnoreCase("iexplore")){
 			// 获取IE版本
-			int ieVersion = (Integer) Driver.runScript("return getIeVersion()");
+			int ieVersion = (Integer) DriverParameter.getDriverPaht().runScript("return getIeVersion()");
 			if (ieVersion == 9 || ieVersion == 10 || ieVersion == 11){
 				// 屏幕坐标点击
 				// X坐标：(document.body.clientWidth - 960)/2+960-126  Y坐标：27
-				float bodyWidth = (Float) Driver.runScript("return document.body.clientWidth;"); //网页可见区域宽
-				float bodyHeight = (Float) Driver.runScript("return window.screen.availHeight;"); //屏幕可用工作区高度
+				float bodyWidth = (Float) DriverParameter.getDriverPaht().runScript("return document.body.clientWidth;"); //网页可见区域宽
+				float bodyHeight = (Float) DriverParameter.getDriverPaht().runScript("return window.screen.availHeight;"); //屏幕可用工作区高度
 				float clickX = (Float) (bodyWidth-960)/2 + 960 -126; // 960 下载条宽度，126 下载条右边界与点击按钮的x坐标差
 				float clickY = (Float) bodyHeight - 50/2; 			// 50 下载条高度。
 				cmdBufferedReader = clickByXY("Yigo",clickX,clickY);
@@ -67,7 +63,7 @@ public class OperateDialog {
 				if (key.equalsIgnoreCase("Excel导出")){
 					cmdBufferedReader = clickButton("文件下载 ","保存");
 					if (cmdBufferedReader.indexOf("true") == -1){
-						Print.log("没有找到“文件下载”对话框！", 2);
+						BaseToolParameter.getPrintThreadLocal().log("没有找到“文件下载”对话框！", 2);
 						return;
 					}
 				}
@@ -75,13 +71,13 @@ public class OperateDialog {
 				if (cmdBufferedReader.indexOf("false") != -1){
 					cmdBufferedReader = close("下载完毕");
 					if (cmdBufferedReader.indexOf("false") != -1){
-						Print.log("没有找到“下载完毕”对话框！", 2);
+						BaseToolParameter.getPrintThreadLocal().log("没有找到“下载完毕”对话框！", 2);
 					}
 				}else{
-					Print.log("没有保存成功！", 2);
+					BaseToolParameter.getPrintThreadLocal().log("没有保存成功！", 2);
 				}
 			}else{
-				Print.log("功能没有实现，IE版本："+ieVersion, 2);
+				BaseToolParameter.getPrintThreadLocal().log("功能没有实现，IE版本："+ieVersion, 2);
 			}
 		}else if(browserName.equalsIgnoreCase("firefox")){
 			if (key.equalsIgnoreCase("Excel导出") || key.equalsIgnoreCase("保存文件")){
@@ -99,7 +95,7 @@ public class OperateDialog {
 					clickY = dialogY + 299;
 					cmdBufferedReader = clickByXY("正在打开",clickX,clickY);
 				}else{
-					Print.log("没有获取到“正在打开”坐标", 2);
+					BaseToolParameter.getPrintThreadLocal().log("没有获取到“正在打开”坐标", 2);
 					return;
 				}
 			}
@@ -109,7 +105,7 @@ public class OperateDialog {
 				cmdBufferedReader = downLoad("请输入要保存的文件名","\""+path+"\"","保存");
 			}
 			if (cmdBufferedReader.equalsIgnoreCase("true")){
-				Print.log("dialog还存在，保存失败！", 2);
+				BaseToolParameter.getPrintThreadLocal().log("dialog还存在，保存失败！", 2);
 			}
 		}else if(browserName.equalsIgnoreCase("chrome")){
 			cmdBufferedReader = downLoad("另存为","\""+path+"\"","保存");
@@ -137,7 +133,7 @@ public class OperateDialog {
 	 * @param clickY
 	 * @return
 	 */
-	private static String clickByXY(String dialogTitle, float clickX, float clickY){
+	public static String clickByXY(String dialogTitle, float clickX, float clickY){
 		String systemBit = GetSystemInfo.getBit();
 		if (systemBit.equals("64")){
 			return CallBat.returnExec(System.getProperty("user.dir")+"/bin/ClickByXY.exe " + dialogTitle + " " + clickX + " " + clickY);
@@ -168,7 +164,7 @@ public class OperateDialog {
 	 * @param buttonName
 	 * @return
 	 */
-	private static String clickButton(String dialogTitle, String buttonName){
+	public static String clickButton(String dialogTitle, String buttonName){
 		String systemBit = GetSystemInfo.getBit();
 		if (systemBit.equals("64")){
 			return CallBat.returnExec(System.getProperty("user.dir")+"/bin/ClickButton.exe " + dialogTitle + " " + buttonName);

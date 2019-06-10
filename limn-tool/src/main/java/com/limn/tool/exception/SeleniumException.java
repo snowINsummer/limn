@@ -1,6 +1,7 @@
 package com.limn.tool.exception;
 
 
+
 /**
  * selenium��ܵ��쳣���࣬��ҪĿ����Ϊ����չException���Ӵ������code
  * �������������£�

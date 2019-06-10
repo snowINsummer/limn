@@ -3,6 +3,8 @@ package com.limn.frame.testcase;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
+import com.limn.tool.exception.ExcelEditorException;
+
 public interface TestCase {
 	
 
@@ -41,8 +43,14 @@ public interface TestCase {
 	 * 激活sheet页
 	 * @param sheetIndex
 	 */
-	public void activateSheet(int sheetIndex);
+	public void activateSheet(int sheetIndex) ;
 
+	/**
+	 * 激活sheet页
+	 * @param sheetName
+	 */
+	public void activateSheet(String sheetName) throws ExcelEditorException;
+	
 	/**
 	 * 是否执行
 	 * @return
@@ -98,6 +106,12 @@ public interface TestCase {
 	public String getResult();
 	
 	/**
+	 * 获取关联属性
+	 * @return
+	 */
+	public String getAssociatedProperites();
+	
+	/**
 	 * 设置是否执行
 	 * @param value 1 or 0
 	 */
@@ -132,6 +146,12 @@ public interface TestCase {
 	 * @param value
 	 */
 	public void setResult(String value);
+	
+	/**
+	 * 设置关联属性
+	 * @param value
+	 */
+	public void setAssociatedProperites(String value);
 	
 //	/**
 //	 * 写入第8列
@@ -203,4 +223,11 @@ public interface TestCase {
 	 * @param path 超链接地址
 	 */
 	public void setHyperLinks(int index, String path);
+	
+	/**
+	 * 获取用例所有要执行的用例个数
+	 * @return
+	 */
+	public int getAllCase();
+
 }

@@ -8,12 +8,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 
+import com.limn.tool.common.BaseToolParameter;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.util.IOUtils;
+
+import com.limn.tool.common.Print;
 
 /**
  * Excel的读写方法
@@ -42,6 +45,10 @@ public class ExcelEditor {
 		sheetCount = excelBook.getNumberOfSheets();
 	}
 	
+//	public static void main(String[] args){
+//		ExcelEditor ee = new ExcelEditor("F:\\test.xls");
+//	}
+	
 	/**
 	 * 
 	 */
@@ -66,6 +73,11 @@ public class ExcelEditor {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+				}
+				try {
+					byteArrayInputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}else{
@@ -174,9 +186,24 @@ public class ExcelEditor {
 
 	}
 	
+	/**
+	 * 根据sheetname返回 index
+	 * @param sheetName
+	 * @return
+	 */
+	public int getSheetIndexBySheetName(String sheetName){
+		HSSFSheet excelSheetTmp = excelBook.getSheet(sheetName);
+		if(excelSheetTmp == null){
+			BaseToolParameter.getPrintThreadLocal().log("不存在的Sheet页名称：" + sheetName, 2);
+			return -1;
+		}else{
+			return excelBook.getSheetIndex(excelSheetTmp);
+		}
+	}
+	
 	private boolean setSheetByIndex(int sheetIndex){
 		if(sheetIndex >= sheetCount){
-			System.out.println("SheetIndex越界:" + sheetIndex + "，总计：" + sheetCount);
+//			System.out.println("SheetIndex越界:" + sheetIndex + "，总计：" + sheetCount);
 			return false;
 		}else{
 			excelSheet = excelBook.getSheetAt(sheetIndex);
@@ -187,7 +214,7 @@ public class ExcelEditor {
 	private boolean setSheetByName(String sheetName){
 		HSSFSheet excelSheetTmp = excelBook.getSheet(sheetName);
 		if(excelSheetTmp == null){
-			System.out.println("不存在的Sheet页名称：" + sheetName);
+			BaseToolParameter.getPrintThreadLocal().log("不存在的Sheet页名称：" + sheetName, 2);
 			return false;
 		}else{
 			excelSheet = excelSheetTmp;
@@ -271,7 +298,8 @@ public class ExcelEditor {
 	 * @return
 	 */
 	public boolean saveAs(String path){
-		return save(path);
+		filePath = path;
+		return save();
 	}
 	
 	

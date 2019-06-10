@@ -2,13 +2,16 @@ package com.limn.frame.results;
 
 import java.util.HashSet;
 
+import com.limn.frame.testcase.TestCase;
+import com.limn.tool.exception.ParameterException;
+
 public class RecordResult implements DataResults {
 	
 	HashSet<DataResults> dataResults = new HashSet<DataResults>();
 	
 	
 	public RecordResult(){
-//		dataResults.add(new XMLData());
+		dataResults.add(new XMLData());
 	}
 	
 	public void addRecordData(DataResults DR){
@@ -16,9 +19,9 @@ public class RecordResult implements DataResults {
 	}
 
 	@Override
-	public void init() {
+	public void init(final TestCase tc) {
 		for(DataResults dr : dataResults){
-			dr.init();
+			dr.init(tc);
 		}	
 	}
 
@@ -96,12 +99,51 @@ public class RecordResult implements DataResults {
 	}
 
 	@Override
-	public void addTestCaseCount(String count) {
+	public void addTestCaseCount() {
 		for(DataResults dr : dataResults){
-			dr.addTestCaseCount(count);
+			dr.addTestCaseCount();
 		}
 		
 	}
 
+	@Override
+	public void addCaseReport() {
+		for(DataResults dr : dataResults){
+			dr.addCaseReport();
+		}
+		
+	}
+
+	@Override
+	public void addCaseLog(String step, int result){
+		for(DataResults dr : dataResults){
+			dr.addCaseLog(step, result);
+		}
+		
+	}
+
+	@Override
+	public int getCaseCount() {
+		for(DataResults dr : dataResults){
+			return dr.getCaseCount();
+		}
+		return 0;
+	}
+
+	@Override
+	public int getExecuteCaseCount() {
+		for(DataResults dr : dataResults){
+			return dr.getExecuteCaseCount();
+		}
+		return 0;
+	}
+
+	@Override
+	public int getSucessCaseCount() {
+		for(DataResults dr : dataResults){
+			return dr.getSucessCaseCount();
+		}
+		return 0;
+	}
 	
 }

@@ -5,7 +5,10 @@ import java.util.HashMap;
 
 import com.limn.frame.testcase.TestCase;
 import com.limn.frame.testcase.TestCaseExcel;
+import com.limn.tool.common.BaseToolParameter;
+import com.limn.tool.common.FileUtil;
 import com.limn.tool.common.Print;
+import com.limn.tool.parameter.Parameter;
 
 
 
@@ -26,7 +29,14 @@ public class EditTestCase{
 		
 	}
 	
+	/**
+	 * 加载测试用例
+	 * @param filePath
+	 */
 	public void openTestCase(String filePath){
+		//Parameter.TESTCASEPATH = filePath;
+		//Parameter.TESTCASE_FOLDERPATH = FileUtil.getParent(Parameter.TESTCASEPATH);
+		
 		testCase = new TestCaseExcel(filePath);
 		testCase.activateSheet(0);
 		refreshModuleData();
@@ -67,7 +77,7 @@ public class EditTestCase{
 		
 		int countRow = end - start + 1;
 
-		String[][] testCaseStep = new String[countRow][5];
+		String[][] testCaseStep = new String[countRow][6];
 		
 		for (int i = 0; i < countRow; i++){
 			testCase.setCurrentRow(start);
@@ -77,6 +87,7 @@ public class EditTestCase{
 			testCaseStep[i][2] = testCase.getRelatedNo();
 			testCaseStep[i][3] = testCase.getTestStep();
 			testCaseStep[i][4] = testCase.getExpected();
+			testCaseStep[i][5] = testCase.getAssociatedProperites();
 		}
 		return testCaseStep;
 	}
@@ -110,7 +121,7 @@ public class EditTestCase{
 		}
 		int diff = count - (end - start);
 
-		Print.log("Start:" + start + " End:" + end + " diff:" + diff,2);
+//		Print.log("Start:" + start + " End:" + end + " diff:" + diff,2);
 		
 		if(diff>0){
 			while(diff!=0){
@@ -136,6 +147,7 @@ public class EditTestCase{
 			testCase.setTestRelatedNo(testCaseTable[rowIndex][2]);
 			testCase.setTestStep(testCaseTable[rowIndex][3]);
 			testCase.setResults(testCaseTable[rowIndex][4]);
+			testCase.setAssociatedProperites(testCaseTable[rowIndex][5]);
 			refreshModuleData();
 			testCase.saveFile();
 			
@@ -170,6 +182,7 @@ public class EditTestCase{
 		testCase.setAcutal("实际结果");
 		testCase.setSQLResults("数据库结果");
 		testCase.setResult("是否通过");
+		testCase.setAssociatedProperites("关联属性");
 		
 		
 		testCase.saveFile();
@@ -194,7 +207,7 @@ public class EditTestCase{
 	
 	public void upModuleCase(int index) throws FileNotFoundException{
 		if(index==0){
-			Print.log("已经是第一行",3);
+			BaseToolParameter.getPrintThreadLocal().log("已经是第一行",3);
 			return;
 		}
 		int rowStart = moduleStartByIndex.get(index) - 2;
